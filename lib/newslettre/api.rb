@@ -19,12 +19,12 @@ class Newslettre::API
       params ||= {}
       options ||= {}
 
-      response, status = request url_for(m, options), params
+      response, status, body = request url_for(m, options), params
 
-      raise ClientFailure if status > 399 and status < 500
-      raise EndpointFailure if status > 499
+      raise ClientFailure, body if status > 399 and status < 500
+      raise EndpointFailure, body if status > 499
 
-      respond response
+      respond body
     end
   end
 
@@ -57,11 +57,11 @@ class Newslettre::API
 
     curl.http_post(*fields)
 
-    [curl, curl.response_code]
+    [curl, curl.response_code, curl.body_str]
   end
 
-  def respond response
-    JSON.load response.body_str
+  def respond body
+    JSON.load body
   end
 
   def url_for path, options = {}
