@@ -17,8 +17,8 @@ end
 
 class OuterWorld
   def newslettre
-    @newslettre ||= Newslettre::Client.new(:email => NEWSLETTRE_CONFIG['sendgrid']['username'],
-                           :password => NEWSLETTRE_CONFIG['sendgrid']['password'])
+    @newslettre ||= Newslettre::Client.new(NEWSLETTRE_CONFIG['sendgrid']['username'],
+                                           NEWSLETTRE_CONFIG['sendgrid']['password'])
   end
 end
 

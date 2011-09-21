@@ -1,4 +1,29 @@
 class Newslettre::Letter < Newslettre::APIModule
+  class Object < Struct.new(:owner, :name, :data)
+    extend Forwardable
+
+    def_delegator :owner, :request
+    def_delegator :owner, :api
+
+    def == other
+      self.to_hash == other
+    end
+
+    def load_data
+      self.data ||= request('get', :name => self.name).to_hash
+    end
+
+    def to_hash
+      load_data
+
+      data
+    end
+
+    def recipients
+      @recipients ||= Newslettre::APIModuleProxy.new self, Recipients.new(self.name, self.api)
+    end
+  end
+
   def list
     request 'list'
   end
@@ -8,7 +33,7 @@ class Newslettre::Letter < Newslettre::APIModule
   end
 
   def get name
-    request 'get', :name => name
+    Object.new self, name
   end
 
   def delete name
@@ -22,9 +47,9 @@ class Newslettre::Letter < Newslettre::APIModule
   class Recipients < Newslettre::APIModule
     attr_reader :letter
 
-    def initialize letter, client
+    def initialize letter, api
       @letter = letter
-      @client = client
+      @api = api
     end
 
     def add list
@@ -34,6 +59,7 @@ class Newslettre::Letter < Newslettre::APIModule
     def get
       request 'get', { :name => letter }
     end
+    alias_method :list, :get
 
     def delete list
       request 'delete', { :list => list, :name => letter }

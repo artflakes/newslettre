@@ -1,8 +1,8 @@
 class Newslettre::APIModule
-  attr_reader :client
+  attr_reader :api
 
-  def initialize client
-    @client = client
+  def initialize api
+    @api = api
   end
 
   protected
@@ -12,6 +12,6 @@ class Newslettre::APIModule
   end
 
   def request method, data = {}
-    self.client.send method, data, { :prefix => api_prefix }
+    @api.send method, data, { :prefix => api_prefix }
   end
 end

@@ -1,48 +1,46 @@
 describe Newslettre do
   before :each do
-    @client = Newslettre::Client.new :email => NEWSLETTRE_CONFIG['sendgrid']['username'],
+    @api = Newslettre::API.new :email => NEWSLETTRE_CONFIG['sendgrid']['username'],
       :password => NEWSLETTRE_CONFIG['sendgrid']['password']
   end
 
   describe "#initialize" do
     it "should accept an email and password" do
-      @client.should be_kind_of(Newslettre::Client)
+      @api.should be_kind_of(Newslettre::API)
     end
 
     it "should set email" do
-      @client.email.should == NEWSLETTRE_CONFIG['sendgrid']['username']
+      @api.email.should == NEWSLETTRE_CONFIG['sendgrid']['username']
     end
 
     it "should set password" do
-      @client.password.should == NEWSLETTRE_CONFIG['sendgrid']['password']
+      @api.password.should == NEWSLETTRE_CONFIG['sendgrid']['password']
     end
 
     it "should target `https://sendgrid.com/api/newsletter/`" do
-      @client.url.should == "https://sendgrid.com/api/newsletter"
+      @api.url.should == "https://sendgrid.com/api/newsletter"
     end
   end
 
   describe "http actions" do
     use_vcr_cassette
 
+    it "should raise on unauthenticated requests" do
+      lambda {
+        Newslettre::API.new.list
+      }.should raise_error(Newslettre::API::NotAuthenticatedFailure)
+    end
+
     it "should auth requests" do
-      @client.list
+      @api.list
     end
 
     it "should raise NotFound on missing resource" do
       lambda {
         VCR.use_cassette('upon raising errors') do
-          @client.delete :name => "A Newsletter that will _hopefully_ never, ever exist!"
+          @api.delete :name => "A Newsletter that will _hopefully_ never, ever exist!"
         end
-      }.should raise_error(Newslettre::Client::ClientFailure)
-    end
-  end
-
-  describe "#newsletters" do
-    it "should be a list" do
-      pending {
-        @client.newsletters.should be_respond_to(:<<)
-      }
+      }.should raise_error(Newslettre::API::ClientFailure)
     end
   end
 
@@ -50,7 +48,7 @@ describe Newslettre do
     use_vcr_cassette
 
     before :each do
-      @identity = Newslettre::Identity.new @client
+      @identity = Newslettre::Identity.new @api
     end
 
     it "should list zero identities" do
@@ -81,7 +79,7 @@ describe Newslettre do
     use_vcr_cassette
 
     before :each do
-      @lists = Newslettre::Lists.new @client
+      @lists = Newslettre::Lists.new @api
     end
 
     it "should list zero test lists" do
@@ -110,10 +108,10 @@ describe Newslettre do
     use_vcr_cassette
 
     before :each do
-      @lists = Newslettre::Lists.new @client
+      @lists = Newslettre::Lists.new @api
       @lists.add('test-list')
 
-      @emails = Newslettre::Lists::Email.new 'test-list', @client
+      @emails = Newslettre::Lists::Email.new 'test-list', @api
 
       @emails.add *NEWSLETTRE_CONFIG['emails']
     end
@@ -134,11 +132,11 @@ describe Newslettre do
     use_vcr_cassette
 
     before :each do
-      @newsletter = Newslettre::Letter.new @client
+      @newsletter = Newslettre::Letter.new @api
     end
 
-    it "should have a client" do
-      @newsletter.client.should == @client
+    it "should have an API" do
+      @newsletter.api.should == @api
     end
 
     it "should list zero test letters" do
@@ -151,7 +149,7 @@ describe Newslettre do
       use_vcr_cassette
 
       before :each do
-        @identity = Newslettre::Identity.new @client
+        @identity = Newslettre::Identity.new @api
         @identity.add "test-identity", NEWSLETTRE_CONFIG['identity']
 
         @newsletter.add 'test', NEWSLETTRE_CONFIG['letter']

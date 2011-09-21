@@ -1,33 +1,33 @@
 Given /^there is no Newsletter named '([^']+)'$/ do |name|
   begin
-    Newslettre::Letter.new(newslettre).delete name
-  rescue Newslettre::Client::ClientFailure
+    newslettre.newsletters.delete name
+  rescue Newslettre::API::ClientFailure
     nil
   end
 end
 
 Given /^there is no '([^']+)' Recipient List$/ do |list|
   begin
-    Newslettre::Lists.new(newslettre).delete list
-  rescue Newslettre::Client::ClientFailure
+    newslettre.lists.delete list
+  rescue Newslettre::API::ClientFailure
     nil
   end
 end
 
 Given /^there is no identity named '([^']+)'$/ do |identity|
   begin
-    Newslettre::Identity.new(newslettre).delete identity
-  rescue Newslettre::Client::ClientFailure
+    newslettre.identities.delete identity
+  rescue Newslettre::API::ClientFailure
     nil
   end
 end
 
 Given /^I add the '([^']+)' Identity$/ do |identity|
-  Newslettre::Identity.new(newslettre).add identity, NEWSLETTRE_CONFIG['identity']
+  newslettre.identities.add identity, NEWSLETTRE_CONFIG['identity']
 end
 
 Given /^I add a Newsletter named '([^']+)' written by '([^']+)'$/ do |name, identity|
-  Newslettre::Letter.new(newslettre).add name,
+  newslettre.newsletters.add name,
     :identity => identity,
     :subject => name,
     :text => "Super Cool!",
@@ -35,29 +35,21 @@ Given /^I add a Newsletter named '([^']+)' written by '([^']+)'$/ do |name, iden
 end
 
 Given /^I add a Recipient List named '([^']+)'$/ do |list|
-  Newslettre::Lists.new(newslettre).add list
+  newslettre.lists.add list
 end
 
 When /^I add '([^']+)' to '([^']+)'$/ do |list, name|
-  recipients = Newslettre::Letter::Recipients.new name, newslettre
-
-  recipients.add list
+  newslettre.newsletters.get(name).recipients.add list
 end
 
 When /^I remove '([^']+)' from '([^']+)'$/ do |list, name|
-  recipients = Newslettre::Letter::Recipients.new name, newslettre
-
-  recipients.delete list
+  newslettre.newsletters.get(name).recipients.delete list
 end
 
 Then /^'([^']+)' will be notified when '([^']+)' is delivered$/ do |list, name|
-  recipients = Newslettre::Letter::Recipients.new name, newslettre
-  lists = recipients.get
-  lists.should =~ [{ "list" => list }]
+  newslettre.newsletters.get(name).recipients.to_a.should =~ [{ "list" => list }]
 end
 
 Then /^no one will be notified when '([^']+)' is delivered$/ do |name|
-  recipients = Newslettre::Letter::Recipients.new name, newslettre
-  lists = recipients.get
-  lists.should be_empty
+  newslettre.newsletters.get(name).recipients.to_a.should be_empty
 end

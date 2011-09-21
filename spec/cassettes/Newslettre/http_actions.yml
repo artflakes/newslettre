@@ -13,12 +13,12 @@
       server:
       - nginx/0.7.65
       date:
-      - Tue, 20 Sep 2011 14:22:17 GMT
+      - Wed, 21 Sep 2011 07:09:02 GMT
       content-type:
       - text/html
       transfer-encoding:
       - chunked
       connection:
       - keep-alive
-    body: ! '[]'
+    body: ! '[{"name": "Superior Soy Beans Discount!"}]'
     http_version: '1.1'
