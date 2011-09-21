@@ -3,3 +3,5 @@
 Gemfile.lock
 pkg/*
 config/newslettre.yml
+spec/cassettes
+features/cassettes
