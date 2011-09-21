@@ -1,4 +1,5 @@
-require 'httparty'
+require 'curb'
+require 'yajl/json_gem'
 
 module Newslettre
   autoload :API, 'newslettre/api'

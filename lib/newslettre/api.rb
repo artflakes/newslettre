@@ -1,21 +1,11 @@
 class Newslettre::API
-  include HTTParty
-  format :json
-  attr_accessor :email, :password
-
-  base_uri "https://sendgrid.com/api/newsletter"
+  attr_accessor :email, :password, :format, :url
 
   def initialize options = {}
+    @url = "https://sendgrid.com/api/newsletter"
     @email = options.delete :email
     @password = options.delete :password
-  end
-
-  def url
-    @url ||= self.class.default_options[:base_uri]
-  end
-
-  def format
-    @format ||= self.class.default_options[:format]
+    @format = :json
   end
 
   def authenticated?
@@ -28,10 +18,13 @@ class Newslettre::API
       params, options = args
       params ||= {}
       options ||= {}
-      response = self.class.post url_for(m, options), :query => params.merge(credentials)
-      raise ClientFailure if response.code > 399 and response.code < 500
-      raise EndpointFailure if response.code > 499
-      response
+
+      response, status = request url_for(m, options), params
+
+      raise ClientFailure if status > 399 and status < 500
+      raise EndpointFailure if status > 499
+
+      respond response
     end
   end
 
@@ -51,7 +44,27 @@ class Newslettre::API
     }
   end
 
+  def request address, params
+    fields =  params.merge(credentials).map { |key, value|
+      if value.kind_of? Array
+        value.map {|v| Curl::PostField.content("#{key}[]", v.to_s) }
+      else
+        Curl::PostField.content(key.to_s, value.to_s)
+      end
+    }.flatten
+
+    curl = Curl::Easy.new address
+
+    curl.http_post(*fields)
+
+    [curl, curl.response_code]
+  end
+
+  def respond response
+    JSON.load response.body_str
+  end
+
   def url_for path, options = {}
-    "#{options[:prefix]}/#{path}.#{format}"
+    "#{url}#{options[:prefix]}/#{path}.#{format}"
   end
 end

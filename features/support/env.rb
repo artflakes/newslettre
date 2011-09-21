@@ -6,8 +6,8 @@ require 'newslettre'
 VCR.config do |c|
   c.stub_with :webmock
   c.cassette_library_dir = 'features/cassettes'
-  c.filter_sensitive_data('<<USERNAME>>') { NEWSLETTRE_CONFIG['sendgrid']['username'] }
-  c.filter_sensitive_data('<<PASSWORD>>') { NEWSLETTRE_CONFIG['sendgrid']['password'] }
+  c.filter_sensitive_data('<<USERNAME>>') { Curl::PostField.content "api_user", NEWSLETTRE_CONFIG['sendgrid']['username'] }
+  c.filter_sensitive_data('<<PASSWORD>>') { Curl::PostField.content "api_key", NEWSLETTRE_CONFIG['sendgrid']['password'] }
   c.default_cassette_options = { :record => :once }
 end
 

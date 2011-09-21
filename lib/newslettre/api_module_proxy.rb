@@ -1,3 +1,5 @@
+require 'forwardable'
+
 class Newslettre::APIModuleProxy
   extend ::Forwardable
 
