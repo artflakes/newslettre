@@ -15,10 +15,10 @@ progress, scheduling etc.).
 
 ## Usage
 
-this is definitely going to change since it's tedious to pass the client
+<del>this is definitely going to change since it's tedious to pass the client
 instance around. Maybe there will be a top-level wrapper to give you
 access to all the _modules_ the API defines (Identity, Newsletter,
-Recipients)
+Recipients)</del>
 
 Right now it works like this…
 
@@ -26,21 +26,33 @@ Right now it works like this…
 
   require 'newslettre'
 
-  client = Newslettre::Client.new :email => "somebody@yourdomain.com",
-  :password => "reallygoodpassword"
+  client = Newslettre::Client.new "somebody@yourdomain.com", "reallygoodpassword"
+  
+  # Accessing newsletters
+  
+  client.newsletters.to_a # => [{ "name" => "webdev" }] 
+  
+  client.newsletters.get("webdev") # => { "name", "subject" => "Latest Web Development News", "html" =>  "<html>...</html>" }
 
-  letters = Newslettre::Letter.new client
+  client.newsletters.delete "webdev"
 
-  letters.list # => [{ "name" => "webdev" }] 
+  # Accessing recipients of a newsletter
 
-
-  letters.get "webdev" # => { "name", "subject" => "Latest Web Development News", "html" =>  "<html>...</html>" }
-
-  letters.delete "webdev"
-
+  client.newsletters.get("webdev").recipients.to_a # => [{ "list" => "web-developers" }]
+  
+  client.newsletters.get("webdev").recipients.delete "web-developers"
+  
 ```
 
-nearly the same goes for `Identity`, `Lists`, `Lists::Email` and `Letter::Recipients`
+<del>nearly the same goes for `Identity`, `Lists`, `Lists::Email` and `Letter::Recipients`</del>
+
+You can also use `#lists` and `#identities` as well as the nested emails in recipient lists.
+
+``` ruby
+
+  client.lists.get("web-developers").emails.delete "selective@hosted.com", "programmatic@failure.com"
+  
+```
 
 ## Development
 
