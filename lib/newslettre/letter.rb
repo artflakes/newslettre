@@ -19,8 +19,34 @@ class Newslettre::Letter < Newslettre::APIModule
       data
     end
 
+    def schedule
+      scheduler.get
+    end
+
+    def deschedule!
+      scheduler.delete
+    end
+
+    def schedule! options = {}
+      scheduler.deliver options
+    end
+
+    def scheduled?
+      begin
+        !!schedule
+      rescue NotScheduledFailure
+        false
+      end
+    end
+
     def recipients
       @recipients ||= Newslettre::APIModuleProxy.new self, Recipients.new(self.name, self.api)
+    end
+
+    protected
+
+    def scheduler
+      @scheduler ||= Schedule.new self.name, self.api
     end
   end
 
@@ -43,6 +69,61 @@ class Newslettre::Letter < Newslettre::APIModule
   def edit name, data = {}
     request 'edit', data
   end
+
+  class Schedule < Newslettre::APIModule
+    attr_reader :letter
+
+    def initialize letter, api
+      @letter = letter
+      @api = api
+    end
+
+    def deliver options = {}
+      require 'time'
+      data = { :name => letter }
+      at = options.delete :at
+      unless at.nil?
+        data[:at] = at.iso8601
+      end
+      request :add, data
+    end
+
+    def delete
+      request :delete, :name => letter
+
+      true
+    end
+
+    def get
+      require 'time'
+      begin
+        date = request(:get, :name => letter)["date"]
+      rescue Newslettre::API::ClientFailure
+        raise NotScheduledFailure, "not found"
+      end
+
+      unless date.nil? or date.size.zero?
+        parse_utc_date date
+      else
+        raise NotScheduledFailure, "invalid date"
+      end
+    end
+
+    protected
+
+    def parse_utc_date date
+      date, time = date.split(" ")
+
+      year, month, day = date.split "-"
+      hour, minute, second = time.split ":"
+
+      Time.utc year, month, day, hour, minute, second
+    end
+
+  end
+
+  class NotScheduledFailure < Newslettre::API::ClientFailure; end
+
 
   class Recipients < Newslettre::APIModule
     attr_reader :letter

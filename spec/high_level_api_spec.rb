@@ -86,4 +86,38 @@ describe "The higher-level API" do
       end
     end
   end
+
+  context Newslettre::Letter::Schedule do
+    subject { @client }
+
+    it "should schedule a newsletter" do
+      Timecop.freeze do
+        Newslettre::Letter::Schedule.any_instance.should_receive(:deliver).with(:at => Time.now)
+        subject.newsletters.get('test-letter').schedule! :at => Time.now
+      end
+    end
+
+    it "should fetch schedule for newsletter" do
+      Newslettre::Letter::Schedule.any_instance.should_receive(:get).and_return(Time.now)
+      subject.newsletters.get('test-letter').schedule.should be_kind_of(Time)
+    end
+
+    it "should delete schedule for newsletter" do
+      Newslettre::Letter::Schedule.any_instance.should_receive(:delete).and_return(true)
+
+      subject.newsletters.get('test-letter').deschedule!.should be_true
+    end
+
+    it "should tell me 'test-letter' is not scheduled" do
+      Newslettre::API.any_instance.should_receive(:get).and_raise(Newslettre::API::ClientFailure)
+
+      subject.newsletters.get('test-letter').should_not be_scheduled
+    end
+
+    it "should tell me 'test-letter' is scheduled" do
+      Newslettre::Letter::Schedule.any_instance.should_receive(:get).and_return(Time.now)
+
+      subject.newsletters.get('test-letter').should be_scheduled
+    end
+  end
 end

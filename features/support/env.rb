@@ -2,6 +2,7 @@ NEWSLETTRE_CONFIG = YAML.load_file File.dirname(__FILE__) + "/../../config/newsl
 
 require 'vcr'
 require 'newslettre'
+require 'chronic'
 
 VCR.config do |c|
   c.stub_with :webmock
@@ -12,7 +13,8 @@ VCR.config do |c|
 end
 
 VCR.cucumber_tags do |t|
-  t.tags '@sendgrid_adding_recipients', '@sendgrid_removing_recipients'
+  t.tags '@sendgrid_adding_recipients', '@sendgrid_removing_recipients', '@sendgrid_scheduling_newsletter',
+    '@sendgrid_descheduling_newsletter'
 end
 
 class OuterWorld

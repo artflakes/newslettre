@@ -1,6 +1,8 @@
 require File.dirname(__FILE__) + '/../lib/newslettre'
 
 require 'vcr'
+require 'rspec-spies'
+require 'timecop'
 
 NEWSLETTRE_CONFIG = YAML.load_file File.dirname(__FILE__) + "/../config/newslettre.yml"
 

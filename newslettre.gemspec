@@ -20,8 +20,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency "yajl-ruby", "~> 0.8"
-  #s.add_dependency "typhoeus", "~> 0.2"
-  #s.add_dependency "faraday", "~> 0.7"
   s.add_dependency "curb", "~> 0.7"
 
   s.add_development_dependency "rake", "~> 0.9"
@@ -29,4 +27,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "webmock", "~> 1.7"
   s.add_development_dependency "vcr", "~> 1.11"
   s.add_development_dependency "cucumber", "~> 1"
+  s.add_development_dependency "chronic", "~> 0.6"
+  s.add_development_dependency "timecop", "~> 0.3"
+  s.add_development_dependency "rspec-spies", "~> 2.0"
 end
