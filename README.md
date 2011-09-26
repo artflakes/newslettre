@@ -10,7 +10,8 @@ progress, scheduling etc.).
 
 ``` ruby
 
-    gem install newslettre
+gem install newslettre
+
 ```
 
 ## Usage
@@ -24,23 +25,23 @@ Right now it works like this…
 
 ``` ruby
 
-  require 'newslettre'
+require 'newslettre'
 
-  client = Newslettre::Client.new "somebody@yourdomain.com", "reallygoodpassword"
+client = Newslettre::Client.new "somebody@yourdomain.com", "reallygoodpassword"
   
-  # Accessing newsletters
+# Accessing newsletters
   
-  client.newsletters.to_a # => [{ "name" => "webdev" }] 
+client.newsletters.to_a # => [{ "name" => "webdev" }] 
   
-  client.newsletters.get("webdev") # => { "name", "subject" => "Latest Web Development News", "html" =>  "<html>...</html>" }
+client.newsletters.get("webdev") # => { "name", "subject" => "Latest Web Development News", "html" =>  "<html>...</html>" }
 
-  client.newsletters.delete "webdev"
+client.newsletters.delete "webdev"
 
-  # Accessing recipients of a newsletter
+# Accessing recipients of a newsletter
 
-  client.newsletters.get("webdev").recipients.to_a # => [{ "list" => "web-developers" }]
+client.newsletters.get("webdev").recipients.to_a # => [{ "list" => "web-developers" }]
   
-  client.newsletters.get("webdev").recipients.delete "web-developers"
+client.newsletters.get("webdev").recipients.delete "web-developers"
   
 ```
 
@@ -50,8 +51,24 @@ You can also use `#lists` and `#identities` as well as the nested emails in reci
 
 ``` ruby
 
-  client.lists.get("web-developers").emails.delete "selective@hosted.com", "programmatic@failure.com"
+client.lists.get("web-developers").emails.delete "selective@hosted.com", "programmatic@failure.com"
   
+```
+
+Last but not least, to schedule an already existing newsletter:
+
+``` ruby
+
+client.newsletters.get("webdev").schedule! :at => Time.now
+
+# to see when a newsletter will be delivered
+
+client.newsletters.get("webdev").schedule # => Mon Sep 26 14:01:13 +0200 2011
+
+# and to deschedule again
+
+client.newsletters.get("webdev").deschedule!
+    
 ```
 
 ## Development
