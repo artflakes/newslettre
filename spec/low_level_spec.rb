@@ -185,6 +185,12 @@ describe Newslettre do
 
       end
 
+      it "should have a list of objects" do
+        @newsletter.list.each do |l|
+          l.should be_kind_of(Newslettre::Letter::Object)
+        end
+      end
+
       it "should create an HTML mail" do
         data = NEWSLETTRE_CONFIG['letter']
         data["html"] = File.read File.dirname(__FILE__) + "/fixtures/test-letter.html"

@@ -51,7 +51,9 @@ class Newslettre::Letter < Newslettre::APIModule
   end
 
   def list
-    request 'list'
+    request('list').map do |n|
+      Object.new self, n["name"]
+    end
   end
 
   def add name, data = {}
