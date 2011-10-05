@@ -140,7 +140,9 @@ class Newslettre::Letter < Newslettre::APIModule
     end
 
     def get
-      request 'get', { :name => letter }
+      request('get', { :name => letter }).map do |l|
+        Newslettre::Lists::Object.new self, l["list"]
+      end
     end
     alias_method :list, :get
 
