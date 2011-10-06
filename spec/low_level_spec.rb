@@ -77,18 +77,31 @@ describe Newslettre do
 
   describe Newslettre::Lists do
     use_vcr_cassette
-
-    before :each do
-      @lists = Newslettre::Lists.new @api
-    end
+    
+    subject { Newslettre::Lists.new @api }
 
     it "should list zero test lists" do
-      @lists.list.each do |l|
+      subject.list.each do |l|
         l["list"].should_not == "test-list"
       end
     end
 
   end
+
+  context "querying a single list" do
+    use_vcr_cassette
+
+    subject { Newslettre::Lists.new(@api).get 'this-list-should-never-exist' }
+
+    it("should produce an object") { should be_kind_of(Newslettre::Lists::Object) }
+
+    it "should raise client error on fetching non-existant list" do
+      lambda {
+        subject.to_hash
+      }.should raise_error(Newslettre::API::ClientFailure)
+    end
+  end
+
 
   context "with a new list" do
     use_vcr_cassette

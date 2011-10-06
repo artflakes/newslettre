@@ -10,7 +10,9 @@ class Newslettre::Lists < Newslettre::APIModule
     end
 
     def load_data
-      self.data ||= request('get', :list => self.list).first.to_hash
+      loaded = request('get', :list => self.list).first
+      raise Newslettre::API::ClientFailure, "missing #{self.list}" if loaded.nil?
+      self.data ||= loaded.to_hash
     end
 
     def to_hash
