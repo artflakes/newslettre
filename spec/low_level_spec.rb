@@ -42,6 +42,16 @@ describe Newslettre do
         end
       }.should raise_error(Newslettre::API::ClientFailure)
     end
+
+    it "should contain error message" do
+      VCR.use_cassette('upon raising errors') do
+        begin
+          @api.delete :name => "A Newsletter that will _hopefully_ never, ever exist!"
+        rescue Newslettre::API::ClientFailure => e
+          e.message.should be == "A Newsletter that will _hopefully_ never, ever exist! does not exist"
+        end
+      end
+    end
   end
 
   describe Newslettre::Identity do

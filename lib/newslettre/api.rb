@@ -21,7 +21,7 @@ class Newslettre::API
 
       response, status, body = request url_for(m, options), params
 
-      raise ClientFailure, body if status > 399 and status < 500
+      raise ClientFailure, JSON.load(body)["error"] if status > 399 and status < 500
       raise EndpointFailure, body if status > 499
 
       respond body
