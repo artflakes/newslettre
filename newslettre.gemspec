@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_dependency "yajl-ruby", "~> 0.8"
+  s.add_dependency "yajl-ruby", "~> 1.1.0"
   s.add_dependency "curb", "~> 0.7"
 
   s.add_development_dependency "rake", "~> 0.9"
