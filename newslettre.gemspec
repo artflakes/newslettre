@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency "yajl-ruby", "~> 1.1.0"
-  s.add_dependency "curb", "~> 0.7"
+  s.add_dependency "curb", "~> 0.8"
 
   s.add_development_dependency "rake", "~> 0.9"
   s.add_development_dependency "rspec", "~> 2"
